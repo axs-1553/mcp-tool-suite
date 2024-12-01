@@ -14,15 +14,8 @@ A versatile tool for running Python scripts through the Model Context Protocol.
 npm install @modelcontextprotocol/sdk glob
 ```
 
-2. Set your scripts directory:
-   - Open server.js
-   - Locate the SCRIPTS_DIR constant
-   - Update it to your preferred path:
-   ```javascript
-   const SCRIPTS_DIR = "C:\\Your\\Scripts\\Path";  // Windows
-   // or
-   const SCRIPTS_DIR = "/your/scripts/path";       // Linux/Mac
-   ```
+2. Configure scripts directory:
+Edit server.js to set your SCRIPTS_DIR path where your .sak.py scripts will be stored.
 
 ## Configuration
 
@@ -37,9 +30,35 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
+## Included Tools
+
+### Data Visualization Suite
+Located in `scripts/viz/`
+
+1. visualize.sak.py: Main visualization tool
+   - Supports multiple plot types: line, bar, scatter, box, violin, heatmap, pie, area, radar, donut
+   - Features:
+     - Multiple subplots with --subplots and --layout
+     - Custom color palettes with --palette
+     - Stacked charts with --stacked
+     - Data insights with --insights
+     - Interactive plots with --interactive
+
+2. Dependencies:
+   ```bash
+   cd scripts/viz
+   pip install -r requirements.txt
+   ```
+
+3. Example Usage:
+   ```bash
+   swiss-army-knife visualize data.csv output.png --type bar --x category --y value
+   swiss-army-knife visualize data.csv viz.html --interactive --insights --subplots "scatter;x=x;y=y|bar;x=category;y=value"
+   ```
+
 ## Creating Custom Scripts
 
-1. Create a new Python script with `.sak.py` extension in your configured SCRIPTS_DIR
+1. Create a new Python script with `.sak.py` extension in your scripts directory
 2. Follow this template:
 ```python
 import argparse
@@ -77,37 +96,19 @@ if __name__ == '__main__':
 - `--info <script_name>`: Show script documentation
 - `<script_name> [args]`: Run a specific script
 
-## Usage Tips
-
-1. Arguments with spaces can be quoted:
-   ```bash
-   swiss-army-knife my-script --message "Hello World"
-   ```
-
-2. Script Information:
-   - Each script should implement the --info flag
-   - Use --info to see documentation for any script
-   - Use --list to see all available scripts
-
-3. Script Directory:
-   - All scripts must be placed in your configured SCRIPTS_DIR
-   - Only .sak.py files are recognized
-   - Scripts are accessed by their name without the .sak.py extension
-
 ## Troubleshooting
 
 1. Script not found:
    - Verify SCRIPTS_DIR path in server.js matches your actual directory
-   - Ensure script file exists in the directory
    - Check file extension is `.sak.py`
    - Check file permissions
 
 2. Python errors:
-   - Verify Python installation: `python --version`
-   - Check script syntax
-   - Install any required Python packages for your scripts
+   - Check Python installation: `python --version`
+   - Verify script syntax
+   - Install required packages for specific scripts
 
-3. Argument handling:
-   - Use quotes for arguments containing spaces
-   - Check script's --info output for expected arguments
-   - Verify argument syntax matches script requirements
+3. Visualization tool issues:
+   - Install all required Python packages: `pip install -r scripts/viz/requirements.txt`
+   - Check input data format (CSV or JSON)
+   - Verify column names match your data
