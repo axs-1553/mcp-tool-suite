@@ -1,73 +1,100 @@
-// Python Interpreter Server
-// A simple TCP server that executes Python code and returns the output
-
+#!/usr/bin/env node
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { spawn } from 'child_process';
-import { createServer } from 'net';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const PYTHON_PATH = 'python'; // User can configure their Python path
-const DEFAULT_PORT = 3000; // User can configure their preferred port
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const server = createServer((socket) => {
-  let dataBuffer = '';
-  let pythonProcess = null;
+const server = new Server({
+    name: "python-interpreter",
+    version: "1.0.0"
+}, {
+    capabilities: {
+        tools: {}
+    }
+});
 
-  socket.on('data', (data) => {
-    dataBuffer += data.toString();
-    
-    try {
-      const message = JSON.parse(dataBuffer);
-      dataBuffer = '';
-      
-      if (message.type === 'execute') {
-        if (pythonProcess) {
-          pythonProcess.kill();
+server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: [{
+        name: "python-interpreter",
+        description: "Execute Python code in a virtual environment",
+        inputSchema: {
+            type: "object",
+            properties: {
+                code: {
+                    type: "string",
+                    description: "Python code to execute"
+                },
+                venv: {
+                    type: "string",
+                    description: "Virtual environment name (optional)",
+                    default: "default"
+                }
+            },
+            required: ["code"]
         }
+    }]
+}));
 
-        pythonProcess = spawn(PYTHON_PATH, ['-c', message.code]);
-        let output = '';
-        let error = '';
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name !== "python-interpreter") {
+        throw new Error(`Unknown tool: ${request.params.name}`);
+    }
+
+    const { code, venv = "default" } = request.params.arguments;
+    const venvPath = path.join(__dirname, '.venvs', venv);
+
+    return new Promise((resolve, reject) => {
+        const pythonProcess = spawn('python', ['-c', code], {
+            env: {
+                ...process.env,
+                VIRTUAL_ENV: venvPath,
+                PATH: `${venvPath}\\Scripts;${process.env.PATH}`
+            }
+        });
+
+        let stdout = '';
+        let stderr = '';
 
         pythonProcess.stdout.on('data', (data) => {
-          output += data.toString();
+            stdout += data.toString();
         });
 
         pythonProcess.stderr.on('data', (data) => {
-          error += data.toString();
+            stderr += data.toString();
         });
 
         pythonProcess.on('close', (code) => {
-          socket.write(JSON.stringify({
-            status: code === 0 ? 'success' : 'error',
-            output: output,
-            error: error
-          }) + '\n');
+            if (code !== 0) {
+                resolve({
+                    content: [{
+                        type: "text",
+                        text: `Error: ${stderr}`
+                    }],
+                    isError: true
+                });
+            } else {
+                resolve({
+                    content: [{
+                        type: "text",
+                        text: stdout
+                    }]
+                });
+            }
         });
-      }
-    } catch (err) {
-      if (err instanceof SyntaxError) {
-        // Incomplete JSON, wait for more data
-        return;
-      }
-      socket.write(JSON.stringify({
-        status: 'error',
-        error: err.message
-      }) + '\n');
-    }
-  });
-
-  socket.on('error', (err) => {
-    console.error('Socket error:', err);
-  });
+    });
 });
 
-server.listen(DEFAULT_PORT, () => {
-  console.log(`Python interpreter server running on port ${DEFAULT_PORT}`);
-});
+async function runServer() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Python Interpreter MCP Server running on stdio");
+}
 
-// Handle server shutdown
-process.on('SIGINT', () => {
-  server.close(() => {
-    console.log('Server shutdown complete');
-    process.exit(0);
-  });
+runServer().catch((error) => {
+    console.error("Fatal error running server:", error);
+    process.exit(1);
 });
