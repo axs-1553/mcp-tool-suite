@@ -11,22 +11,18 @@ A versatile tool for running Python scripts through the Model Context Protocol.
 
 1. Install MCP SDK and dependencies:
 ```bash
-npm install @modelcontextprotocol/sdk
+npm install @modelcontextprotocol/sdk glob
 ```
 
-2. Set up the scripts directory:
-```bash
-mkdir scripts
-```
-
-3. Point MCP_HOME to your Node.js modules directory:
-```bash
-# Windows (PowerShell)
-$env:MCP_HOME = "C:\Users\YourUsername\AppData\Roaming\npm\node_modules"
-
-# Linux/Mac
-export MCP_HOME="/usr/local/lib/node_modules"
-```
+2. Set your scripts directory:
+   - Open server.js
+   - Locate the SCRIPTS_DIR constant
+   - Update it to your preferred path:
+   ```javascript
+   const SCRIPTS_DIR = "C:\\Your\\Scripts\\Path";  // Windows
+   // or
+   const SCRIPTS_DIR = "/your/scripts/path";       // Linux/Mac
+   ```
 
 ## Configuration
 
@@ -41,19 +37,9 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-## Running the Server
-
-```bash
-# Make server executable
-chmod +x server.js
-
-# Run the server
-./server.js
-```
-
 ## Creating Custom Scripts
 
-1. Create a new Python script with `.sak.py` extension in the `scripts` directory
+1. Create a new Python script with `.sak.py` extension in your configured SCRIPTS_DIR
 2. Follow this template:
 ```python
 import argparse
@@ -91,34 +77,37 @@ if __name__ == '__main__':
 - `--info <script_name>`: Show script documentation
 - `<script_name> [args]`: Run a specific script
 
+## Usage Tips
+
+1. Arguments with spaces can be quoted:
+   ```bash
+   swiss-army-knife my-script --message "Hello World"
+   ```
+
+2. Script Information:
+   - Each script should implement the --info flag
+   - Use --info to see documentation for any script
+   - Use --list to see all available scripts
+
+3. Script Directory:
+   - All scripts must be placed in your configured SCRIPTS_DIR
+   - Only .sak.py files are recognized
+   - Scripts are accessed by their name without the .sak.py extension
+
 ## Troubleshooting
 
 1. Script not found:
-   - Ensure script is in the `scripts` directory
+   - Verify SCRIPTS_DIR path in server.js matches your actual directory
+   - Ensure script file exists in the directory
    - Check file extension is `.sak.py`
-   - Verify file permissions
+   - Check file permissions
 
 2. Python errors:
-   - Check Python installation: `python --version`
-   - Verify script syntax
-   - Check required packages are installed
+   - Verify Python installation: `python --version`
+   - Check script syntax
+   - Install any required Python packages for your scripts
 
-3. Server connection issues:
-   - Verify Claude Desktop is running
-   - Check MCP_HOME environment variable
-   - Ensure server path in config is correct
-
-## Common Issues and Solutions
-
-1. "Module not found" errors:
-   - Install missing Python packages: `pip install <package_name>`
-   - Check Python environment path
-
-2. Permission denied:
-   - Run `chmod +x server.js`
-   - Check script directory permissions
-
-3. Server won't start:
-   - Verify Node.js version: `node --version`
-   - Check MCP SDK installation
-   - Validate config file syntax
+3. Argument handling:
+   - Use quotes for arguments containing spaces
+   - Check script's --info output for expected arguments
+   - Verify argument syntax matches script requirements
