@@ -1,6 +1,6 @@
 # GPT-4 MCP Tool
 
-Access OpenAI's GPT-4 through Model Context Protocol.
+Access OpenAI's GPT-4 through Model Context Protocol. Coded to use GPT-4o-mini but any model can be used.
 
 ## Prerequisites
 - Node.js v18.x or later
