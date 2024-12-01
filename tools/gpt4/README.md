@@ -2,9 +2,16 @@
 
 Access OpenAI's GPT-4 through Model Context Protocol.
 
+## Prerequisites
+- Node.js v18.x or later
+- npm or yarn
+- OpenAI API key
+
 ## Installation
 ```bash
-npm install @modelcontextprotocol/sdk axios
+# Install MCP SDK and dependencies
+npm install @modelcontextprotocol/sdk
+npm install axios
 ```
 
 ## Configuration
@@ -21,3 +28,20 @@ Add to `claude_desktop_config.json`:
   }
 }
 ```
+
+## Running the Server
+```bash
+# Make executable
+chmod +x server.js
+
+# Run directly
+./server.js
+
+# Or via node
+node server.js
+```
+
+## Features
+- Direct access to GPT-4
+- Configurable system messages
+- Adjustable response temperature (0-1)
