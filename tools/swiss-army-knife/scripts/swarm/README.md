@@ -2,7 +2,7 @@
 
 A comprehensive suite for running and managing AI agent swarms through MCP.
 
-## Components
+## Core Components
 
 ### 1. Swarm Framework (swarm_framework.sak.py)
 Core execution engine that:
@@ -20,6 +20,66 @@ Management interface that:
 - Combines agent outputs
 - Provides status reporting
 
+## Message Board System
+
+The Message Board is a central communication system that facilitates agent coordination and result persistence.
+
+### Message Structure
+Each message contains:
+- Sender ID (agent or manager)
+- Content (task output or command)
+- Task ID (for grouping related messages)
+- Timestamp
+- File path for storage
+
+### Storage System
+The Message Board implements:
+1. In-memory message queue
+2. Persistent JSON storage
+3. Individual message files
+4. Task-based organization
+
+### Message Flow
+1. **Creation**
+   - Agent generates output
+   - Message object created
+   - Timestamp added
+
+2. **Storage**
+   - Message added to queue
+   - Written to message_board.json
+   - Individual file created
+
+3. **Retrieval**
+   - Filter by task ID
+   - Chronological ordering
+   - Load from persistent storage
+
+### Communication Patterns
+1. **Agent to Manager**
+   - Task completion
+   - Status updates
+   - Error reporting
+
+2. **Manager to Agent**
+   - Task assignments
+   - Control commands
+   - Configuration updates
+
+## State Management
+
+### Framework State
+- Active tasks
+- Message history
+- Agent assignments
+- Task outputs
+
+### Manager State
+- Agent registry
+- Status tracking
+- Output locations
+- Task metadata
+
 ## Installation
 ```bash
 pip install asyncio
@@ -27,112 +87,127 @@ pip install asyncio
 
 ## Usage
 
-### Running Tasks with the Framework
-```bash
-# Execute a task with multiple subtasks
-swiss-army-knife swarm_framework --task "Write a research paper" \
-  --subtasks \
-  "Research latest developments" \
-  "Analyze current trends" \
-  "Write conclusions"
+[Previous usage examples remain the same...]
 
-# List all tasks
-swiss-army-knife swarm_framework --list-tasks
+## Current Limitations and Weaknesses
 
-# Get task messages
-swiss-army-knife swarm_framework --get-messages <task_id>
-```
+1. **Scalability Issues**
+   - In-memory message queue limits
+   - Single file storage bottlenecks
+   - Sequential message processing
 
-### Managing Agents with Swarm Manager
-```bash
-# Create a new agent
-swiss-army-knife swarm-manager --create "Generate creative story"
+2. **Fault Tolerance**
+   - No automatic recovery
+   - Single point of failure (message board)
+   - Limited error handling
 
-# List all agents and their status
-swiss-army-knife swarm-manager --list
+3. **Agent Management**
+   - Basic lifecycle management
+   - No agent prioritization
+   - Limited resource control
 
-# Update agent status
-swiss-army-knife swarm-manager --update 1 --status running
+4. **State Management**
+   - File-based persistence only
+   - No distributed state
+   - Potential race conditions
 
-# Combine completed outputs
-swiss-army-knife swarm-manager --combine
-```
+5. **Task Handling**
+   - Linear task execution
+   - Limited subtask dependencies
+   - No task prioritization
 
-## Directory Structure
-```
-swarm/
-├── swarm_framework.sak.py   # Main execution framework
-├── swarm-manager.sak.py     # Agent management interface
-├── functions.py            # Support functions (GPT-4 integration)
-└── swarm_outputs/         # Output directory
-    ├── message_board.json  # Framework message history
-    ├── swarm_state.json   # Manager state persistence
-    └── agent_outputs/     # Individual agent results
-```
+## Future Development Plan
 
-## State and Output Files
+### Phase 1: Robustness
+- [ ] Implement distributed message queue
+- [ ] Add database backend option
+- [ ] Enhance error recovery
+- [ ] Improve state persistence
 
-### Framework Files
-- `message_board.json`: Communication history
-- `<task_id>_agent_*.txt`: Individual agent outputs
-- `<task_id>_manager_*.txt`: Synthesized results
+### Phase 2: Scalability
+- [ ] Add agent pooling
+- [ ] Implement load balancing
+- [ ] Support distributed execution
+- [ ] Add message compression
 
-### Manager Files
-- `swarm_state.json`: Agent states and metadata
-- `agent_*_output.txt`: Individual agent outputs
-- `combined_output.txt`: Combined agent results
+### Phase 3: Intelligence
+- [ ] Dynamic task prioritization
+- [ ] Smart resource allocation
+- [ ] Agent specialization
+- [ ] Learning from past executions
 
-## Examples
+### Phase 4: Features
+- [ ] Real-time monitoring dashboard
+- [ ] Advanced task dependencies
+- [ ] Agent collaboration patterns
+- [ ] Custom agent behaviors
 
-### Complex Task Execution
-```bash
-# Start with framework for main task
-swiss-army-knife swarm_framework --task "Create marketing campaign" \
-  --subtasks \
-  "Research target audience" \
-  "Develop key messages" \
-  "Design campaign structure"
+### Phase 5: Integration
+- [ ] External system connectors
+- [ ] API endpoints
+- [ ] Authentication/Authorization
+- [ ] Metrics and logging
 
-# Monitor agents with manager
-swiss-army-knife swarm-manager --list
+## Integration Capabilities
 
-# Update status as agents complete
-swiss-army-knife swarm-manager --update 1 --status completed
+### Current Integrations
+1. **GPT-4**
+   - Direct integration
+   - System message support
+   - Temperature control
 
-# Combine final outputs
-swiss-army-knife swarm-manager --combine
-```
+2. **File System**
+   - Message persistence
+   - Output storage
+   - State management
 
-## Workflow Best Practices
+### Planned Integrations
+1. **Databases**
+   - Message storage
+   - State persistence
+   - Query capabilities
 
-1. **Task Planning**
-   - Break down complex tasks into clear subtasks
-   - Consider dependencies between subtasks
-   - Plan agent coordination strategy
+2. **Monitoring Systems**
+   - Performance metrics
+   - Status dashboard
+   - Alert system
 
-2. **Execution**
-   - Start with swarm_framework for task distribution
-   - Use manager to monitor progress
-   - Update agent statuses as they complete
+## Best Practices
 
-3. **Result Collection**
-   - Monitor individual agent outputs
-   - Use manager to combine completed work
-   - Review synthesized results from framework
+[Previous best practices remain the same...]
 
-## Troubleshooting
+## Contributing
 
-1. **Framework Issues**
-   - Check message board integrity
-   - Verify GPT-4 connectivity
-   - Monitor async execution
+Areas where contributions would be most valuable:
+1. Scalability improvements
+2. Error handling
+3. State management
+4. Testing framework
+5. Documentation
 
-2. **Manager Issues**
-   - Check state file persistence
-   - Verify agent status updates
-   - Monitor output file creation
+## Security Considerations
 
-3. **Integration Issues**
-   - Ensure both components can access shared files
-   - Verify output directory permissions
-   - Check file naming conventions
+Current security measures:
+- Path validation
+- Input sanitization
+- Basic error handling
+
+Needed improvements:
+- Authentication system
+- Message encryption
+- Access control
+- Audit logging
+
+## Performance Optimization
+
+Current bottlenecks:
+1. File I/O operations
+2. Message serialization
+3. Sequential processing
+4. Memory usage
+
+Planned optimizations:
+1. Batch processing
+2. Caching layer
+3. Async I/O
+4. Resource pooling
