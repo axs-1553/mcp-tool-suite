@@ -1,394 +1,177 @@
-# Swarm Framework and Manager
+# Swarm Framework
 
-A comprehensive suite for running and managing AI agent swarms through MCP.
+A sophisticated framework for managing and coordinating AI agents in a swarm architecture. This implementation provides both basic and enhanced functionality for agent management, task execution, and monitoring.
 
-## Table of Contents
-1. [Core Components](#core-components)
-2. [Message Board System](#message-board-system)
-3. [Installation and Setup](#installation-and-setup)
-4. [Directory Structure](#directory-structure)
-5. [Usage Guide](#usage-guide)
-6. [State Management](#state-management)
-7. [Integration Capabilities](#integration-capabilities)
-8. [Best Practices](#best-practices)
-9. [Limitations and Weaknesses](#current-limitations-and-weaknesses)
-10. [Future Development](#future-development-plan)
-11. [Swiss Army Tool Integration](#swiss-army-tool-integration)
-12. [Security and Performance](#security-and-performance)
+## Components
 
-## Core Components
+1. **Base Framework** (`swarm_framework.sak.py`):
+   - Core message-passing and task execution
+   - GPT-4 integration for agent tasks
+   - Asynchronous operations
+   - Message board for agent communication
 
-### 1. Swarm Framework (swarm_framework.sak.py)
-Core execution engine that:
-- Coordinates multiple AI agents
-- Handles async task execution
-- Manages message passing
-- Integrates with GPT-4
-- Synthesizes results
+2. **Swarm Manager** (`swarm-manager.sak.py`):
+   - Basic agent lifecycle management
+   - State persistence
+   - Simple output handling
+   - Status tracking
 
-### 2. Swarm Manager (swarm-manager.sak.py)
-Management interface that:
-- Creates and tracks agents
-- Monitors agent status
-- Persists swarm state
-- Combines agent outputs
-- Provides status reporting
+3. **Enhanced Framework** (`enhanced-swarm.sak.py` & `enhanced-swarm-daemon.py`):
+   - Persistent daemon process for continuous operation
+   - Priority-based task scheduling
+   - Dependency management
+   - Role-based agent organization
+   - Performance metrics and monitoring
+   - Error logging
 
-## Message Board System
+## Dependencies
 
-The Message Board is a central communication system that facilitates agent coordination and result persistence.
+The framework requires the following Python packages:
+```
+psutil
+asyncio
+typing
+logging
+```
 
-### Message Structure
-Each message contains:
-- Sender ID (agent or manager)
-- Content (task output or command)
-- Task ID (for grouping related messages)
-- Timestamp
-- File path for storage
+Additionally, the framework uses environment-provided functions:
+- `gpt4`: For AI agent task execution
+- Any other MCP environment functions
 
-### Storage System
-The Message Board implements:
-1. In-memory message queue
-2. Persistent JSON storage
-3. Individual message files
-4. Task-based organization
+## Usage
 
-### Message Flow
-1. **Creation**
-   - Agent generates output
-   - Message object created
-   - Timestamp added
-
-2. **Storage**
-   - Message added to queue
-   - Written to message_board.json
-   - Individual file created
-
-3. **Retrieval**
-   - Filter by task ID
-   - Chronological ordering
-   - Load from persistent storage
-
-### Communication Patterns
-1. **Agent to Manager**
-   - Task completion
-   - Status updates
-   - Error reporting
-
-2. **Manager to Agent**
-   - Task assignments
-   - Control commands
-   - Configuration updates
-
-## Installation and Setup
-
-### Prerequisites
+### Basic Framework
 ```bash
-# Python dependencies
-pip install asyncio
-pip install aiohttp
-pip install typing_extensions
+# Execute a task with subtasks
+swiss-army-knife swarm_framework --task "main task" --subtasks "subtask1" "subtask2"
 
-# For GPT-4 integration
-export OPENAI_API_KEY="your-api-key"
-```
-
-### Directory Setup
-```bash
-mkdir -p swarm_outputs
-mkdir -p swarm_outputs/agent_outputs
-```
-
-## Directory Structure
-```
-swarm/
-├── swarm_framework.sak.py   # Main execution framework
-├── swarm-manager.sak.py     # Agent management interface
-├── functions.py             # Support functions (GPT-4 integration)
-└── swarm_outputs/          # Output directory
-    ├── message_board.json   # Framework message history
-    ├── swarm_state.json    # Manager state persistence
-    └── agent_outputs/      # Individual agent results
-```
-
-## Usage Guide
-
-### Basic Framework Operations
-
-1. Execute Single Task
-```bash
-# Run a task with multiple subtasks
-swiss-army-knife swarm_framework --task "Write a blog post" \
-  --subtasks \
-  "Research current trends in AI" \
-  "Draft outline and key points" \
-  "Write introduction and body" \
-  "Create conclusion and call to action"
-```
-
-2. View Task Status
-```bash
 # List all tasks
 swiss-army-knife swarm_framework --list-tasks
 
-# Get specific task messages
-swiss-army-knife swarm_framework --get-messages task_12345
+# Get messages for a specific task
+swiss-army-knife swarm_framework --get-messages <task_id>
 ```
 
-### Swarm Manager Operations
-
-1. Agent Management
+### Swarm Manager
 ```bash
-# Create new agent
-swiss-army-knife swarm-manager --create "Generate product descriptions"
+# Create a new agent
+swiss-army-knife swarm-manager --create "task description"
 
 # List all agents
 swiss-army-knife swarm-manager --list
 
 # Update agent status
-swiss-army-knife swarm-manager --update 1 --status running
-swiss-army-knife swarm-manager --update 1 --status completed
+swiss-army-knife swarm-manager --update <id> --status <status>
 
-# Combine agent outputs
+# Combine outputs
 swiss-army-knife swarm-manager --combine
 ```
 
-### Complete Workflow Example
+### Enhanced Framework
 ```bash
-# 1. Start main task
-swiss-army-knife swarm_framework --task "Create marketing campaign" \
-  --subtasks \
-  "Research target demographics" \
-  "Develop messaging strategy" \
-  "Design visual elements" \
-  "Create content calendar"
+# Create an agent with priority and role
+swiss-army-knife enhanced-swarm --create "task" --task-type high --role worker
 
-# 2. Monitor progress
-swiss-army-knife swarm-manager --list
+# Create an agent with dependencies
+swiss-army-knife enhanced-swarm --create "task" --task-type medium --role worker --dependencies 1 2
 
-# 3. Update status
-swiss-army-knife swarm-manager --update 1 --status completed
+# View metrics
+swiss-army-knife enhanced-swarm --metrics <agent_id>
+swiss-army-knife enhanced-swarm --swarm-metrics
 
-# 4. Generate final output
-swiss-army-knife swarm-manager --combine
+# Stop the daemon
+swiss-army-knife enhanced-swarm --stop-daemon
 ```
 
-## State Management
+## Note on GPT-4 Integration
 
-### Framework State
-- Active tasks
-- Message history
-- Agent assignments
-- Task outputs
+The framework is designed to work within an MCP environment that provides GPT-4 integration via a `gpt4` function. This function is expected to be available in the environment and should accept the following parameters:
+- `prompt`: The text prompt for GPT-4
+- `temperature`: Controls response randomness (0-1)
+- `system_message`: Optional message to set GPT-4's behavior
 
-### Manager State
-- Agent registry
-- Status tracking
-- Output locations
-- Task metadata
+If you're using this framework outside the MCP environment, you'll need to modify the GPT-4 integration in `swarm_framework.sak.py` to match your environment's AI capabilities.
 
-## Integration Capabilities
+## Storage and State Management
 
-### Current Integrations
-1. **GPT-4**
-   - Direct integration
-   - System message support
-   - Temperature control
+The framework uses several types of storage:
 
-2. **File System**
-   - Message persistence
-   - Output storage
-   - State management
+1. **Message Board Storage**:
+   - Location: `swarm_outputs/` directory
+   - Contents: Agent messages and task outputs
+   - Format: Individual text files and a JSON index
 
-### Planned Integrations
-1. **Databases**
-   - Message storage
-   - State persistence
-   - Query capabilities
+2. **State Files**:
+   - `swarm_state.json`: Main state file for agent tracking
+   - `daemon.pid`: Daemon process ID file
+   - Format: JSON for state, plain text for PID
 
-2. **Monitoring Systems**
-   - Performance metrics
-   - Status dashboard
-   - Alert system
+3. **Agent Outputs**:
+   - Named as `agent_<id>_output.txt`
+   - Contains individual agent task results
+   - Can be combined using the `--combine` option
 
-## Best Practices
+## Agent Roles and Task Types
 
-### 1. Task Design
-- Break complex tasks into focused subtasks
-- Ensure clear dependencies
-- Provide context in task descriptions
-- Use consistent naming conventions
+### Roles:
+- **Coordinator**: Manages task distribution and synchronization
+- **Worker**: Executes primary tasks
+- **Analyzer**: Processes and analyzes results
+- **Monitor**: Tracks system health and performance
 
-### 2. Agent Management
-- Monitor agent status regularly
-- Update status promptly
-- Clean up completed tasks
-- Archive important outputs
+### Task Types (Priority Levels):
+- **Critical**: Highest priority, immediate execution
+- **High**: Important tasks, prioritized execution
+- **Medium**: Standard priority level
+- **Low**: Background tasks, executed when resources available
 
-### 3. Resource Usage
-- Limit concurrent agents
-- Monitor memory usage
-- Clean old message files
-- Regular state backups
+## Error Handling and Logging
 
-### 4. Error Handling
-- Check task prerequisites
-- Validate inputs
-- Monitor agent timeouts
-- Handle partial failures
+The framework implements comprehensive error handling:
 
-### 5. Output Management
-- Use descriptive filenames
-- Organize by task ID
-- Regular cleanup
-- Backup important results
+1. **Daemon Process**:
+   - Graceful startup/shutdown
+   - Process monitoring
+   - Automatic restart on failure
 
-## Current Limitations and Weaknesses
+2. **State Management**:
+   - Atomic state updates
+   - State file corruption protection
+   - Automatic state recovery
 
-1. **Scalability Issues**
-   - In-memory message queue limits
-   - Single file storage bottlenecks
-   - Sequential message processing
+3. **Logging**:
+   - Standard logging levels (INFO, ERROR, etc.)
+   - Agent-specific error logs
+   - Performance metrics tracking
 
-2. **Fault Tolerance**
-   - No automatic recovery
-   - Single point of failure (message board)
-   - Limited error handling
+## Development and Extension
 
-3. **Agent Management**
-   - Basic lifecycle management
-   - No agent prioritization
-   - Limited resource control
+To extend the framework:
 
-4. **State Management**
-   - File-based persistence only
-   - No distributed state
-   - Potential race conditions
+1. **Adding New Agent Types**:
+   - Extend the `--role` options in `enhanced-swarm.sak.py`
+   - Implement role-specific logic in the daemon
 
-5. **Task Handling**
-   - Linear task execution
-   - Limited subtask dependencies
-   - No task prioritization
+2. **Custom Metrics**:
+   - Add fields to the metrics dictionary in agent state
+   - Implement collection in the daemon process
 
-## Future Development Plan
+3. **Integration Points**:
+   - GPT-4 integration in `swarm_framework.sak.py`
+   - State management in each component
+   - Daemon process logic
 
-### Phase 1: Robustness
-- [ ] Implement distributed message queue
-- [ ] Add database backend option
-- [ ] Enhance error recovery
-- [ ] Improve state persistence
+## Limitations and Considerations
 
-### Phase 2: Scalability
-- [ ] Add agent pooling
-- [ ] Implement load balancing
-- [ ] Support distributed execution
-- [ ] Add message compression
+1. **Resource Management**:
+   - Monitor system resources when running many agents
+   - Consider implementing rate limiting for API calls
 
-### Phase 3: Intelligence
-- [ ] Dynamic task prioritization
-- [ ] Smart resource allocation
-- [ ] Agent specialization
-- [ ] Learning from past executions
+2. **State Persistence**:
+   - Regular backups recommended
+   - Consider implementing state file versioning
 
-### Phase 4: Features
-- [ ] Real-time monitoring dashboard
-- [ ] Advanced task dependencies
-- [ ] Agent collaboration patterns
-- [ ] Custom agent behaviors
-
-### Phase 5: Integration
-- [ ] External system connectors
-- [ ] API endpoints
-- [ ] Authentication/Authorization
-- [ ] Metrics and logging
-
-## Swiss Army Tool Integration
-
-### Current Implementation
-- Framework uses GPT-4 for task processing
-- Basic tool execution through subprocess
-- File-based result handling
-
-### Planned Integration Features
-
-1. **Direct Tool Access**
-```python
-class EnhancedAgent:
-    async def execute_tool(self, tool_name: str, args: dict):
-        return await swiss_army.call_tool(tool_name, args)
-```
-
-2. **Tool Chain Execution**
-```bash
-swiss-army-knife swarm_framework --task "Analyze data" \
-  --subtasks \
-  "process_data:clean_dataset input.csv" \
-  "visualize:create_charts processed_data.csv" \
-  "analyze:generate_insights charts/"
-```
-
-3. **Tool Registry System**
-```python
-class ToolRegistry:
-    def register_tool(self, name: str, capabilities: List[str]):
-        self.tools[name] = capabilities
-
-    def find_tool(self, required_capability: str):
-        return [t for t in self.tools if required_capability in t.capabilities]
-```
-
-### Integration Roadmap
-1. **Phase 1: Basic Integration**
-   - Tool discovery system
-   - Simple tool execution
-   - Result parsing
-
-2. **Phase 2: Advanced Features**
-   - Tool chaining
-   - State management
-   - Error handling
-
-3. **Phase 3: Intelligence**
-   - Smart tool selection
-   - Result optimization
-   - Learning from usage
-
-## Security and Performance
-
-### Security Considerations
-
-Current measures:
-- Path validation
-- Input sanitization
-- Basic error handling
-
-Needed improvements:
-- Authentication system
-- Message encryption
-- Access control
-- Audit logging
-
-### Performance Optimization
-
-Current bottlenecks:
-1. File I/O operations
-2. Message serialization
-3. Sequential processing
-4. Memory usage
-
-Planned optimizations:
-1. Batch processing
-2. Caching layer
-3. Async I/O
-4. Resource pooling
-
-## Contributing
-
-Areas where contributions would be most valuable:
-1. Scalability improvements
-2. Error handling
-3. State management
-4. Testing framework
-5. Documentation
-
-For feature requests or bug reports, please open an issue in the repository.
+3. **Security**:
+   - No built-in authentication/authorization
+   - Implement access controls if needed
+   - Monitor API usage and rate limits
