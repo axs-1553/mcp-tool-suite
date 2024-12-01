@@ -23,7 +23,7 @@ class Message:
         }
 
 class MessageBoard:
-    def __init__(self, storage_path: str = "swarm_outputs"):
+    def __init__(self, storage_path: str = "E:/Artificial Intelligence/MCP/swiss-army-files/swarm_outputs"):
         self.storage_path = storage_path
         os.makedirs(storage_path, exist_ok=True)
         self.messages: List[Message] = []
@@ -132,7 +132,7 @@ def main():
         swiss-army-knife swarm_framework --list-tasks
         swiss-army-knife swarm_framework --get-messages <task_id>
         
-        Outputs saved to: swarm_outputs/
+        Outputs saved to: E:/Artificial Intelligence/MCP/swiss-army-files/swarm_outputs/
         """)
         return
 
