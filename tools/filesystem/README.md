@@ -1,6 +1,6 @@
 # Filesystem MCP Tool
 
-File system operations through Model Context Protocol with directory access control.
+File system operations through Model Context Protocol with directory access control. This is a different implementation than the default MCP server from Anthropic.
 
 ## Prerequisites
 - Node.js v18.x or later
