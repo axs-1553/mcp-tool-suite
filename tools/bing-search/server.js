@@ -2,7 +2,12 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import fetch from 'node-fetch';
+import axios from "axios";
+
+const BING_API_KEY = process.env.BING_API_KEY;
+if (!BING_API_KEY) {
+    throw new Error("BING_API_KEY environment variable is required");
+}
 
 const server = new Server({
     name: "bing-search",
@@ -43,31 +48,35 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     const { query, count = 10 } = request.params.arguments;
-    const url = `https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(query)}&count=${count}`;
 
     try {
-        const response = await fetch(url, {
+        const response = await axios.get('https://api.bing.microsoft.com/v7.0/search', {
             headers: {
-                'Ocp-Apim-Subscription-Key': process.env.BING_API_KEY
+                'Ocp-Apim-Subscription-Key': BING_API_KEY
+            },
+            params: {
+                q: query,
+                count: count
             }
         });
 
-        if (!response.ok) {
-            throw new Error(`Bing API error: ${response.statusText}`);
-        }
+        const results = response.data.webPages.value.map(page => ({
+            title: page.name,
+            url: page.url,
+            snippet: page.snippet
+        }));
 
-        const data = await response.json();
         return {
             content: [{
                 type: "text",
-                text: JSON.stringify(data, null, 2)
+                text: JSON.stringify(results, null, 2)
             }]
         };
     } catch (error) {
         return {
             content: [{
                 type: "text",
-                text: `Error: ${error.message}`
+                text: `Search error: ${error.message}`
             }],
             isError: true
         };
