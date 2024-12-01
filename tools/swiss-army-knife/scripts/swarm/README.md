@@ -1,157 +1,138 @@
-# Swarm Framework
+# Swarm Framework and Manager
 
-An asynchronous multi-agent framework that coordinates AI agents to solve complex tasks collaboratively.
+A comprehensive suite for running and managing AI agent swarms through MCP.
 
-## Features
-- Asynchronous task execution
-- Persistent message board
-- Task state management
-- Agent coordination
-- Result synthesis
+## Components
 
-## Prerequisites
+### 1. Swarm Framework (swarm_framework.sak.py)
+Core execution engine that:
+- Coordinates multiple AI agents
+- Handles async task execution
+- Manages message passing
+- Integrates with GPT-4
+- Synthesizes results
+
+### 2. Swarm Manager (swarm-manager.sak.py)
+Management interface that:
+- Creates and tracks agents
+- Monitors agent status
+- Persists swarm state
+- Combines agent outputs
+- Provides status reporting
+
+## Installation
 ```bash
 pip install asyncio
 ```
 
-## Core Components
-
-### 1. Message System
-- **Message Class**: Handles communication between agents
-  - Sender identification
-  - Content storage
-  - Task tracking
-  - Timestamp recording
-
-### 2. Message Board
-- **Persistent Storage**: Saves all communication
-- **Message Retrieval**: Filter by task ID
-- **Structured Output**: Organizes agent outputs
-
-### 3. Swarm Manager
-- **Task Coordination**: Manages agent execution
-- **Async Operations**: Parallel task processing
-- **Result Synthesis**: Combines agent outputs
-
 ## Usage
 
-### Basic Task Execution
+### Running Tasks with the Framework
 ```bash
+# Execute a task with multiple subtasks
 swiss-army-knife swarm_framework --task "Write a research paper" \
   --subtasks \
-  "Research latest developments in AI" \
+  "Research latest developments" \
   "Analyze current trends" \
-  "Write introduction and methodology" \
-  "Create conclusions"
-```
+  "Write conclusions"
 
-### View Active Tasks
-```bash
+# List all tasks
 swiss-army-knife swarm_framework --list-tasks
-```
 
-### Get Task Messages
-```bash
+# Get task messages
 swiss-army-knife swarm_framework --get-messages <task_id>
 ```
 
-### Get Help
+### Managing Agents with Swarm Manager
 ```bash
-swiss-army-knife swarm_framework --info
+# Create a new agent
+swiss-army-knife swarm-manager --create "Generate creative story"
+
+# List all agents and their status
+swiss-army-knife swarm-manager --list
+
+# Update agent status
+swiss-army-knife swarm-manager --update 1 --status running
+
+# Combine completed outputs
+swiss-army-knife swarm-manager --combine
 ```
 
-## Output Structure
+## Directory Structure
 ```
-swarm_outputs/
-├── message_board.json           # All messages and task history
-├── <task_id>_agent_0_*.txt     # Agent 0's output
-├── <task_id>_agent_1_*.txt     # Agent 1's output
-└── <task_id>_manager_*.txt     # Final synthesized result
+swarm/
+├── swarm_framework.sak.py   # Main execution framework
+├── swarm-manager.sak.py     # Agent management interface
+├── functions.py            # Support functions (GPT-4 integration)
+└── swarm_outputs/         # Output directory
+    ├── message_board.json  # Framework message history
+    ├── swarm_state.json   # Manager state persistence
+    └── agent_outputs/     # Individual agent results
 ```
 
-## Task Flow
-1. **Task Creation**
-   - Main task defined
-   - Subtasks distributed
+## State and Output Files
 
-2. **Agent Execution**
-   - Parallel processing
-   - Individual outputs saved
+### Framework Files
+- `message_board.json`: Communication history
+- `<task_id>_agent_*.txt`: Individual agent outputs
+- `<task_id>_manager_*.txt`: Synthesized results
 
-3. **Message Management**
-   - Communications logged
-   - Results stored
-
-4. **Result Synthesis**
-   - Outputs combined
-   - Final solution created
-
-## Response Format
-```json
-{
-  "task_id": "unique_id",
-  "main_task": "task description",
-  "status": "completed",
-  "outputs": [
-    "path/to/agent0_output.txt",
-    "path/to/agent1_output.txt"
-  ],
-  "final_output": "path/to/final_result.txt"
-}
-```
+### Manager Files
+- `swarm_state.json`: Agent states and metadata
+- `agent_*_output.txt`: Individual agent outputs
+- `combined_output.txt`: Combined agent results
 
 ## Examples
 
-### Research Project
+### Complex Task Execution
 ```bash
-swiss-army-knife swarm_framework --task "Research impact of AI on healthcare" \
-  --subtasks \
-  "Research current AI applications in healthcare" \
-  "Analyze effectiveness studies" \
-  "Identify future trends" \
-  "Compile recommendations"
-```
-
-### Content Creation
-```bash
+# Start with framework for main task
 swiss-army-knife swarm_framework --task "Create marketing campaign" \
   --subtasks \
   "Research target audience" \
   "Develop key messages" \
-  "Design campaign structure" \
-  "Create content outline"
+  "Design campaign structure"
+
+# Monitor agents with manager
+swiss-army-knife swarm-manager --list
+
+# Update status as agents complete
+swiss-army-knife swarm-manager --update 1 --status completed
+
+# Combine final outputs
+swiss-army-knife swarm-manager --combine
 ```
 
-## Best Practices
+## Workflow Best Practices
 
-1. **Task Division**
-   - Keep subtasks focused
-   - Ensure clear dependencies
-   - Balance workload
+1. **Task Planning**
+   - Break down complex tasks into clear subtasks
+   - Consider dependencies between subtasks
+   - Plan agent coordination strategy
 
-2. **Monitoring**
-   - Check task status regularly
-   - Review agent outputs
-   - Track message history
+2. **Execution**
+   - Start with swarm_framework for task distribution
+   - Use manager to monitor progress
+   - Update agent statuses as they complete
 
-3. **Results Management**
-   - Save important outputs
-   - Document task IDs
-   - Organize by project
+3. **Result Collection**
+   - Monitor individual agent outputs
+   - Use manager to combine completed work
+   - Review synthesized results from framework
 
 ## Troubleshooting
 
-1. **Task Execution Issues**
-   - Verify subtask clarity
-   - Check for dependency conflicts
-   - Monitor agent responses
+1. **Framework Issues**
+   - Check message board integrity
+   - Verify GPT-4 connectivity
+   - Monitor async execution
 
-2. **Storage Problems**
-   - Check directory permissions
-   - Verify file paths
-   - Monitor disk space
+2. **Manager Issues**
+   - Check state file persistence
+   - Verify agent status updates
+   - Monitor output file creation
 
-3. **Message Board Issues**
-   - Check JSON integrity
-   - Verify message format
-   - Clear corrupted entries
+3. **Integration Issues**
+   - Ensure both components can access shared files
+   - Verify output directory permissions
+   - Check file naming conventions
