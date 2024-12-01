@@ -1,11 +1,25 @@
-# Python Interpreter Server
+# Python Interpreter MCP Tool
 
-A Node.js TCP server that executes Python code and returns the output.
+Execute Python code in virtual environments through Model Context Protocol.
+
+## Prerequisites
+- Node.js v18.x or later
+- npm or yarn
+- Python 3.x
+
+## Installation
+```bash
+# Install MCP SDK dependencies
+npm install @modelcontextprotocol/sdk
+
+# Set up virtual environment directory
+mkdir .venvs
+python -m venv .venvs/default
+```
 
 ## Configuration
 
 Add to your `claude_desktop_config.json`:
-
 ```json
 {
   "python-interpreter": {
@@ -16,13 +30,19 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-## Usage
+## Running the Server
+```bash
+# Make server executable
+chmod +x server.js
 
-The server accepts JSON messages with:
-- `type`: "execute"
-- `code`: Python code to run
+# Run directly
+./server.js
 
-Returns JSON response with:
-- `status`: "success" or "error" 
-- `output`: stdout content
-- `error`: stderr content if any
+# Or via node
+node server.js
+```
+
+## Virtual Environments
+- Default environment in `.venvs/default`
+- Create additional environments in `.venvs/` directory
+- Specify environment name with `venv` parameter in requests
