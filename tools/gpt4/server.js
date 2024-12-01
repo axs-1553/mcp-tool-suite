@@ -27,7 +27,7 @@ async function callGPT4(prompt, apiKey, systemMessage = "", temperature = 0.7) {
                 'Content-Type': 'application/json'
             },
             data: {
-                model: 'gpt-4',
+                model: 'gpt-4o-mini',
                 messages: [
                     { role: 'system', content: systemMessage || "You are a helpful AI assistant." },
                     { role: 'user', content: prompt }
