@@ -56,6 +56,81 @@ Located in `scripts/viz/`
    swiss-army-knife visualize data.csv viz.html --interactive --insights --subplots "scatter;x=x;y=y|bar;x=category;y=value"
    ```
 
+### AI Swarm Tools
+A suite of tools for managing and orchestrating AI agent swarms:
+
+1. ai-swarm.sak.py: Basic AI Swarm Manager
+   - Create and manage AI agents
+   - Basic task distribution
+   - Simple output collection
+   - Status monitoring
+
+2. enhanced-swarm.sak.py: Advanced Swarm Operations
+   - Enhanced task distribution algorithms
+   - Advanced agent communication
+   - Sophisticated output aggregation
+   - Performance monitoring
+
+3. swarm-manager.sak.py: Swarm Management Interface
+   - Agent lifecycle management
+   - Task queue management
+   - Resource allocation
+   - Performance metrics
+
+4. swarm_framework.sak.py: Core Swarm Framework
+   - Base classes and utilities
+   - Communication protocols
+   - State management
+   - Error handling
+
+Example Usage:
+```bash
+swiss-army-knife ai-swarm --task "Analyze this text" --agents 5
+swiss-army-knife swarm-manager --status
+swiss-army-knife enhanced-swarm --task "Complex analysis" --agents 10 --mode collaborative
+```
+
+### GitHub Integration Tools
+Tools for interacting with GitHub repositories:
+
+1. github.sak.py: Main GitHub Operations Tool
+   - Create/manage repositories
+   - File operations
+   - Issue management
+   - Pull request handling
+   - Repository forking
+
+2. github-list-repos.sak.py: Repository Listing Tool
+   - List user repositories
+   - Filter by various criteria
+   - Sort and search functionality
+
+Example Usage:
+```bash
+swiss-army-knife github --token <token> --action create-repo --repo test-repo --description "Test repo" --private
+swiss-army-knife github-list-repos --user <username> --filter "stars>100"
+```
+
+### Data Management Tools
+
+1. kvstore.sak.py: Key-Value Store Manager
+   - Simple key-value storage
+   - Persistent data management
+   - Value versioning
+   - Import/export functionality
+
+2. transform.sak.py: Data Transformation Tool
+   - Format conversion
+   - Data cleaning
+   - Schema transformation
+   - Validation rules
+
+Example Usage:
+```bash
+swiss-army-knife kvstore --set key1 value1
+swiss-army-knife transform input.csv output.json --format json --clean
+```
+
 ## Creating Custom Scripts
 
 1. Create a new Python script with `.sak.py` extension in your scripts directory
